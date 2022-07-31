@@ -3,4 +3,5 @@ __pycache__
 .vscode
 /data/alternateNamesV2.txt
 /data/cities500.txt
+/data/cities15000.txt
 /data/countryInfo.txt
