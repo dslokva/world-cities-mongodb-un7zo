@@ -1,0 +1,6 @@
+__pycache__
+./cache
+.vscode
+/data/alternateNamesV2.txt
+/data/cities500.txt
+/data/countryInfo.txt

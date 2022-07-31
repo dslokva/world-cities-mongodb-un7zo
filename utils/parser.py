@@ -1,0 +1,123 @@
+import csv
+import re
+
+from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path
+from models.AlternateName import AlternateName
+from models.City import City
+from models.Country import Country
+import settings
+
+
+def read_csv_by_line(file_path, callback):
+    with open(file_path, encoding="utf8") as file_to_parse:
+        for line in csv.reader(file_to_parse, dialect='excel-tab'):
+            if line and not line[0].startswith("#"):
+                callback(line)
+
+
+#########################
+#   Parse the cities    #
+#########################
+cities = []
+cities_dict = {}
+
+def has_cyrillic(text):
+    return bool(re.search('[а-яА-Я]', text))
+
+
+def filter_cyrillic(names_list):
+    for name in names_list:
+        if has_cyrillic(name):
+            return name
+
+
+def save_extra_city_fields(city):
+    def get_attrs_to_add():
+        attrs_to_add = {
+            'city_id': getattr(city, 'city_id')
+        }
+        for attr in settings.CITY_FIELDS_TO_ADD:
+            attrs_to_add[attr] = getattr(city, attr)
+
+        if settings.ADD_CITY_CYRILLIC_NAME_TO_COUNTRY:
+            attrs_to_add['name_ru'] = filter_cyrillic(getattr(city, 'alternate_names'))
+
+        return attrs_to_add
+
+    if not settings.ADD_CITY_TO_COUNTRY:
+        return
+
+    if not city.country_code in cities_dict:
+        cities_dict[city.country_code] = []
+
+    cities_dict[city.country_code].append(get_attrs_to_add())
+
+
+def parse_city_callback(line):
+    city = City(line)
+    cities.append(city.to_dict())
+    save_extra_city_fields(city)
+
+
+def parse_altername_name_callback(line):
+    alternate_name = AlternateName(line)
+
+    if alternate_name.is_historical:
+        return
+    if not alternate_name.alter_name_type:
+        return
+    if not int(alternate_name.real_item_id) in countries_ids:
+        return
+    
+    if alternate_name.alter_name_type == 'ru':
+        for country in countries:
+            if country['country_id'] == int(alternate_name.real_item_id):
+                country['country_ru'] = alternate_name.alter_name
+
+
+def parse_alternate_names():
+    if settings.ADD_COUNTRY_CYRYLLIC_NAME:
+        read_csv_by_line(get_alternate_names_data_path(), parse_altername_name_callback)
+
+
+def parse_city():
+    read_csv_by_line(get_city_data_path(), parse_city_callback)
+
+
+#########################
+#  Parse the countries  #
+#########################
+countries = []
+countries_ids = []
+countries_dict = {}
+match_language_countries_iso = []
+
+
+def parse_country_callback(line):
+    country = Country(line)
+    countries.append(country.to_dict())
+    countries_ids.append(country.country_id)
+    if settings.ADD_COUNTRY_TO_CITY:
+        countries_dict[country.iso] = country
+
+    if settings.ONLY_LANGUAGE:
+        for language in country.languages:
+            if language in settings.ONLY_LANGUAGE:
+                match_language_countries_iso.append(country.iso)
+                break
+
+
+def parse_country():
+    read_csv_by_line(get_country_data_path(), parse_country_callback)
+
+
+# Extra filter:
+# To only add the countries and cities which use language in settings.ONLY_LANGUAGE
+# We can filter the contries when processing to gain more performance
+# But I like to keep they all here to cleaner logic.
+def remove_non_match_language_countries_and_cities():
+    if not settings.ONLY_LANGUAGE:
+        return
+
+    cities[:] = [c for c in cities if c['country_code'] in match_language_countries_iso]
+    countries[:] = [c for c in countries if c['iso'] in match_language_countries_iso]
