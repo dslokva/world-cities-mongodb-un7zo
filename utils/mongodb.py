@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from utils.parser import cities, countries, dxcc_data, cities_dict, countries_dict
+from utils.parser import cities, countries, dxcc_data, lotw_useractivity_data, cities_dict, countries_dict
 from urllib.parse import quote_plus
 import settings
 
@@ -13,11 +13,13 @@ DB = MONGO_CLIENT[settings.DB_NAME]
 CITY_COLLECTION = DB[settings.CITY_COLLECTION_NAME]
 COUNTRY_COLLECTION = DB[settings.COUNTRY_COLLECTION_NAME]
 DXCC_COLLECTION = DB[settings.DXCC_COLLECTION_NAME]
+LOTW_USERS_COLLECTION = DB[settings.LOTW_USERS_COLLECTION_NAME]
 
 def init():
-    CITY_COLLECTION.drop()
-    COUNTRY_COLLECTION.drop()
-    DXCC_COLLECTION.drop()
+    # CITY_COLLECTION.drop()
+    # COUNTRY_COLLECTION.drop()
+    # DXCC_COLLECTION.drop()
+    LOTW_USERS_COLLECTION.drop()
 
 #################
 #  Save cities  #
@@ -60,6 +62,9 @@ def save_countries():
 
 def save_dxcc():
     save_to_db(DXCC_COLLECTION, dxcc_data)
+
+def save_lotw():
+    save_to_db(LOTW_USERS_COLLECTION, lotw_useractivity_data)
 
 
 def save_to_db(mongo_collection, data):

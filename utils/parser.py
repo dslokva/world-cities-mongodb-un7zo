@@ -1,17 +1,18 @@
 import csv
 import re
-
-from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path, get_dxcc_data_path
+import settings
+from datetime import datetime
+from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path, get_dxcc_data_path, get_lotw_file_path
 from models.AlternateName import AlternateName
 from models.City import City
 from models.Dxcc import Dxcc
 from models.Country import Country
-import settings
+from models.LotwUserActivity import LotwUserActivity
 
 
-def read_csv_by_line(file_path, callback):
+def read_csv_by_line(file_path, callback, dialect='excel-tab'):
     with open(file_path, encoding="utf8") as file_to_parse:
-        for line in csv.reader(file_to_parse, dialect='excel-tab'):
+        for line in csv.reader(file_to_parse, dialect):
             if line and not line[0].startswith("#"):
                 callback(line)
 
@@ -22,6 +23,7 @@ def read_csv_by_line(file_path, callback):
 cities = []
 cities_dict = {}
 dxcc_data = []
+lotw_useractivity_data = []
 
 
 def has_cyrillic(text):
@@ -61,9 +63,19 @@ def parse_city_callback(line):
     cities.append(city.to_dict())
     save_extra_city_fields(city)
 
+
 def parse_dxcc_callback(line):
     dxcc = Dxcc(line)
     dxcc_data.append(dxcc.to_dict())
+
+
+def parse_lotw_callback(line):
+    lotw = LotwUserActivity(line)
+    combined_dict = {}
+    combined_dict['callsign'] = lotw.callsign
+    combined_dict['datetime'] = datetime.strptime(lotw.activity_date + ' ' + lotw.activity_time, '%Y-%m-%d %H:%M:%S')
+    # 2008-09-16,17:36:57
+    lotw_useractivity_data.append(combined_dict)
 
 
 def parse_altername_name_callback(line):
@@ -95,11 +107,20 @@ def parse_dxcc():
     read_csv_by_line(get_dxcc_data_path(), parse_dxcc_callback)
 
 
+def clue_lotwuser_datetime(lotw_file_path):
+    pass
+
+
+def parse_lotw():
+    with open(get_lotw_file_path(), newline='') as csvfile:
+        dialect = csv.Sniffer().sniff(csvfile.read(1024))
+    read_csv_by_line(get_lotw_file_path(), parse_lotw_callback, dialect)
+
+
 #########################
 #  Parse the countries  #
 #########################
 countries = []
-dxcc_data = []
 countries_ids = []
 countries_dict = {}
 match_language_countries_iso = []
