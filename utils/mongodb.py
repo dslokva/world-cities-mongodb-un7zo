@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from utils.parser import cities, countries, cities_dict, countries_dict
+from utils.parser import cities, countries, dxcc_data, cities_dict, countries_dict
 from urllib.parse import quote_plus
 import settings
 
@@ -12,10 +12,12 @@ MONGO_CLIENT = MongoClient(URI)
 DB = MONGO_CLIENT[settings.DB_NAME]
 CITY_COLLECTION = DB[settings.CITY_COLLECTION_NAME]
 COUNTRY_COLLECTION = DB[settings.COUNTRY_COLLECTION_NAME]
+DXCC_COLLECTION = DB[settings.DXCC_COLLECTION_NAME]
 
 def init():
     CITY_COLLECTION.drop()
     COUNTRY_COLLECTION.drop()
+    DXCC_COLLECTION.drop()
 
 #################
 #  Save cities  #
@@ -54,6 +56,11 @@ def add_extra_cities_fields():
 def save_countries():
     add_extra_cities_fields()
     save_to_db(COUNTRY_COLLECTION, countries)
+
+
+def save_dxcc():
+    save_to_db(DXCC_COLLECTION, dxcc_data)
+
 
 def save_to_db(mongo_collection, data):
     if not isinstance(data, list):

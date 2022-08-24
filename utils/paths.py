@@ -13,6 +13,8 @@ def get_country_data_path():
 def get_city_data_path():
     return os.path.join(get_data_folder_path(), 'cities500.txt')
 
+def get_dxcc_data_path():
+    return os.path.join(get_data_folder_path(), 'dxcc_list.txt')
 
 def get_alternate_names_data_path():
     return os.path.join(get_data_folder_path(), 'alternateNamesV2.txt')

@@ -1,9 +1,10 @@
 import csv
 import re
 
-from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path
+from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path, get_dxcc_data_path
 from models.AlternateName import AlternateName
 from models.City import City
+from models.Dxcc import Dxcc
 from models.Country import Country
 import settings
 
@@ -20,6 +21,8 @@ def read_csv_by_line(file_path, callback):
 #########################
 cities = []
 cities_dict = {}
+dxcc_data = []
+
 
 def has_cyrillic(text):
     return bool(re.search('[а-яА-Я]', text))
@@ -58,6 +61,10 @@ def parse_city_callback(line):
     cities.append(city.to_dict())
     save_extra_city_fields(city)
 
+def parse_dxcc_callback(line):
+    dxcc = Dxcc(line)
+    dxcc_data.append(dxcc.to_dict())
+
 
 def parse_altername_name_callback(line):
     alternate_name = AlternateName(line)
@@ -84,10 +91,15 @@ def parse_city():
     read_csv_by_line(get_city_data_path(), parse_city_callback)
 
 
+def parse_dxcc():
+    read_csv_by_line(get_dxcc_data_path(), parse_dxcc_callback)
+
+
 #########################
 #  Parse the countries  #
 #########################
 countries = []
+dxcc_data = []
 countries_ids = []
 countries_dict = {}
 match_language_countries_iso = []

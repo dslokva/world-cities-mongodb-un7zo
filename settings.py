@@ -6,6 +6,7 @@ DB_NAME = 'WorldCities'
 
 CITY_COLLECTION_NAME = 'cities'
 COUNTRY_COLLECTION_NAME = 'countries'
+DXCC_COLLECTION_NAME = 'dxcc'
 
 # Only countries with languages below.
 # Find the languages here:
