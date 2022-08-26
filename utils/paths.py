@@ -10,7 +10,7 @@ def get_country_data_path():
     return os.path.join(get_data_folder_path(), 'countryInfo.txt')
 
 
-def get_city_data_path():
+def get_city500_data_path():
     return os.path.join(get_data_folder_path(), 'cities500.txt')
 
 

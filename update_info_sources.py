@@ -2,7 +2,7 @@ import urllib.request
 import zipfile
 import shutil
 import os
-from utils.paths import get_country_data_path, get_city_data_path, get_lotw_file_path, get_data_folder_path
+from utils.paths import get_country_data_path, get_city500_data_path, get_lotw_file_path, get_data_folder_path, get_alternate_names_data_path
 
 
 def download_file(url, file_name):
@@ -23,14 +23,15 @@ def fetch_country_info():
     shutil.copy(country_file_name, get_country_data_path())
     os.remove(os.path.join(os.getcwd(), country_file_name))
 
-def fetch_city_15000_info():
-    cities_zip_file_name = 'cities15000.zip'
-    cities_file_name = 'cities15000.txt'
-    download_file('http://download.geonames.org/export/dump/cities15000.zip', cities_zip_file_name)
-    unzip_file(cities_zip_file_name, os.getcwd())
-    shutil.copy(cities_file_name, get_city_data_path())
-    os.remove(cities_zip_file_name)    
-    os.remove(cities_file_name)
+
+# def fetch_city_15000_info():
+#     cities_zip_file_name = 'cities15000.zip'
+#     cities_file_name = 'cities15000.txt'
+#     download_file('http://download.geonames.org/export/dump/cities15000.zip', cities_zip_file_name)
+#     unzip_file(cities_zip_file_name, os.getcwd())
+#     shutil.copy(cities_file_name, get_city_data_path())
+#     os.remove(cities_zip_file_name)
+#     os.remove(cities_file_name)
 
 
 def fetch_city_500_info():
@@ -38,7 +39,7 @@ def fetch_city_500_info():
     cities_file_name = 'cities500.txt'
     download_file('http://download.geonames.org/export/dump/cities500.zip', cities_zip_file_name)
     unzip_file(cities_zip_file_name, os.getcwd())
-    shutil.copy(cities_file_name, get_city_data_path())
+    shutil.copy(cities_file_name, get_city500_data_path())
     os.remove(cities_zip_file_name)
     os.remove(cities_file_name)
 
@@ -58,13 +59,13 @@ def fetch_alternate_names():
     alter_names_file_name = 'alternateNamesV2.txt'
     download_file('http://download.geonames.org/export/dump/alternateNamesV2.zip', alter_names_zip_file_name)
     unzip_file(alter_names_zip_file_name, os.getcwd())
-    shutil.copy(alter_names_file_name, get_city_data_path())
+    shutil.copy(alter_names_file_name, get_alternate_names_data_path())
     os.remove(alter_names_zip_file_name)
     os.remove(alter_names_file_name)
 
 
-# fetch_country_info()
-# fetch_lotw_user_info()
-# fetch_city_500_info()
-# fetch_alternate_names()
+fetch_lotw_user_info()
+fetch_country_info()
+fetch_alternate_names()
+fetch_city_500_info()
 # fetch_city_15000_info()

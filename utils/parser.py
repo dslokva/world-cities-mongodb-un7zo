@@ -2,7 +2,7 @@ import csv
 import re
 import settings
 from datetime import datetime
-from utils.paths import get_city_data_path, get_country_data_path, get_alternate_names_data_path, get_dxcc_data_path, get_lotw_file_path
+from utils.paths import get_city500_data_path, get_country_data_path, get_alternate_names_data_path, get_dxcc_data_path, get_lotw_file_path
 from models.AlternateName import AlternateName
 from models.City import City
 from models.Dxcc import Dxcc
@@ -100,7 +100,7 @@ def parse_alternate_names():
 
 
 def parse_city():
-    read_csv_by_line(get_city_data_path(), parse_city_callback)
+    read_csv_by_line(get_city500_data_path(), parse_city_callback)
 
 
 def parse_dxcc():
